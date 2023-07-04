@@ -24,12 +24,12 @@ contract Voting {
     event Voted(uint topicId, address voter);
     
     modifier onlyAdmin() {
-        require(msg.sender == admin, "You are not authorized.");
+        require(msg.sender == admin, "Not authorized.");
         _;
     }
     
     modifier votingIsActive() {
-        require(votingOpen, "Voting closed.");
+        require(votingOpen, "Closed.");
         _;
     }
     
@@ -46,8 +46,8 @@ contract Voting {
     
     function openVoting(uint topicId) public onlyAdmin {
         Topic storage topic = topics[topicId];
-        require(!votingOpen, "Voting is open already.");
-        require(topic.open == false, "Voting for this topic is open already.");
+        require(!votingOpen, "Voting is opened.");
+        require(topic.open == false, "Voting for this topic is opened.");
         topic.open = true;
         votingOpen = true;
         emit VotingOpened(topicId);
@@ -55,8 +55,8 @@ contract Voting {
     
     function closeVoting(uint topicId) public onlyAdmin {
         Topic storage topic = topics[topicId];
-        require(votingOpen, "Voting is not open.");
-        require(topic.open == true, "Voting for this topic is not open.");
+        require(votingOpen, "Voting is closed.");
+        require(topic.open == true, "Voting for this topic is closed.");
         topic.open = false;
         votingOpen = false;
         emit VotingClosed(topicId, topic.yesVotes, topic.noVotes);
@@ -66,7 +66,7 @@ contract Voting {
         Topic storage topic = topics[topicId];
         require(isVoter[msg.sender] == false, "You have already voted.");
         require(hasVoted[topicId][msg.sender] == false, "You have already voted for this topic.");
-        require(choice == true || choice == false, "You must choose either yes or no.");
+        require(choice == true || choice == false, "You must either choose yes or no.");
         if (choice) {
             topic.yesVotes++;
         } else {
@@ -81,8 +81,8 @@ contract Voting {
     
     function rewardVoters(uint topicId, address[] memory correctVoters, uint rewardAmount) public onlyAdmin {
         Topic storage topic = topics[topicId];
-        require(!votingOpen, "Voting is still open.");
-        require(topic.open == false, "Voting for this topic is still open.");
+        require(!votingOpen, "Voting is opened.");
+        require(topic.open == false, "Voting for this topic is opened.");
         require(correctVoters.length > 0, "There must be at least one correct voter.");
         uint rewardPerVoter = rewardAmount / correctVoters.length;
         for (uint i = 0; i < correctVoters.length; i++) {
